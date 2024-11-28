@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gift Card Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 30px auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        h1 {
+            text-align: center;
+            color: #4D4B9E;
+        }
+        label {
+            display: block;
+            margin-top: 8px;
+            font-weight: bold;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #8778b8;
+            color: white;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #4D4B9E;
+        }
+        #giftPreview {
+            display: none;
+            margin-top: 20px;
+            text-align: center;
+        }
+        #giftPreview img {
+            max-width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+
+        /* Estilos para el logo */
+        .logo {
+            width: 100px; /* Ajusta el tamaño a tu preferencia */
+            height: auto;
+            display: block;
+            margin: 10px auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Agregar el logo de Akane -->
+        <img src="https://akanespa.cl/wp-content/uploads/2022/02/Group_-160x179.png" alt="Logo de Akane Spa" class="logo">
+        
+    <div class="container">
+        <h1>Generador de Gift Cards</h1>
+        <form id="giftCardForm">
+            <label for="destinatario">Nombre del Destinatario</label>
+            <input type="text" id="destinatario" pattern="[A-Za-zÀ-ÿ\s,.'-&]+" required placeholder="Ejemplo: Juan Pérez">
+
+            <label for="remitente">Nombre del Remitente</label>
+            <input type="text" id="remitente" pattern="[A-Za-zÀ-ÿ\s,.'-&]+" required placeholder="Ejemplo: María López">
+
+            <label for="tipoMasaje">Tipo de Masaje</label>
+            <select id="tipoMasaje" required>
+                <option value="Masaje a elección 60 Min">Masaje a elección 60 Min</option>
+                <option value="Masaje a elección 90 Min">Masaje a elección 90 Min</option>
+                <option value="Masaje a elección 120 Min">Masaje a elección 120 Min</option>
+                <option value="Masaje Dúo 60 Min">Masaje Dúo 60 Min</option>
+                <option value="Masaje Dúo 90 Min">Masaje Dúo 90 Min</option>
+                <option value="Masaje Dúo 120 Min">Masaje Dúo 120 Min</option>
+                <option value="Masaje Express 30 Min">Express 30 Min</option>
+            </select>
+
+            <label for="fechaCompra">Fecha de Compra</label>
+            <input type="date" id="fechaCompra" required>
+
+            <label for="mensaje">Mensaje especial (Opcional) </label>
+            <input type="text" id="mensaje" pattern="[A-Za-zÀ-ÿ\s,.'-&]+" placeholder="Ejemplo: Feliz cumpleaños!">
+
+            <label for="gcwebcode">Gift Card Web Code (Opcional)</label>
+            <input type="text" id="gcwebcode" name="code" pattern="[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}" placeholder="Ejemplo: NJL7-HJ9K-VLK6-Q4U4" title="El código debe estar en el formato: XXXX-XXXX-XXXX-XXXX" oninput="formatGiftCardCode(this)" maxlength="19" />
+
+            <button type="submit">Generar Gift Card</button>
+        </form>
+
+        <div id="giftPreview">
+            <h2>Vista previa</h2>
+            <img id="previewImage" alt="Vista previa de la Gift Card">
+        </div>
+    </div>
+
+    <script>
+     function formatGiftCardCode(input) {
+        // Convertir el valor a mayúsculas
+        let value = input.value.toUpperCase();
+        
+        // Remover todo lo que no sea alfanumérico (letras y números)
+        value = value.replace(/[^A-Z0-9]/g, '');
+
+        // Limitar a 16 caracteres (sin contar los guiones)
+        value = value.substring(0, 16);
+
+        // Insertar guiones después de cada 4 caracteres
+        let formattedValue = '';
+        for (let i = 0; i < value.length; i++) {
+            formattedValue += value[i];
+            // Agregar un guion después de cada 4 caracteres
+            if ((i + 1) % 4 === 0 && i + 1 < value.length) {
+                formattedValue += '-';
+            }
+        }
+
+        // Establecer el valor formateado de vuelta al input
+        input.value = formattedValue;
+    }
+
+    // Añadir un listener al campo de código web
+    document.getElementById("gcwebcode").addEventListener("input", function () {
+        formatGiftCardCode(this);
+    });
+
+
+        const form = document.getElementById("giftCardForm");
+        const preview = document.getElementById("giftPreview");
+        const previewImage = document.getElementById("previewImage");
+
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            // Obtener los valores del formulario
+            const destinatario = document.getElementById("destinatario").value;
+            const remitente = document.getElementById("remitente").value;
+            const tipoMasaje = document.getElementById("tipoMasaje").value;
+            const fechaCompra = document.getElementById("fechaCompra").value;
+            let mensaje = document.getElementById("mensaje").value;
+            const gcwebcode = document.getElementById("gcwebcode").value;
+            
+            // Envolver el mensaje en comillas dobles
+            mensaje = `"${mensaje}"`;  // Agrega las comillas al principio y al final
+
+            // Log de los valores capturados
+            console.log("Destinatario:", destinatario);
+            console.log("Remitente:", remitente);
+            console.log("Tipo de Masaje:", tipoMasaje);
+            console.log("Fecha de Compra:", fechaCompra);
+            console.log("mensaje:", mensaje);
+            console.log("Web Code:", gcwebcode);
+
+            try {
+                console.log("Enviando datos al servidor...");
+                const response = await fetch("/generate/", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ mensaje, destinatario, remitente, tipo: tipoMasaje, fecha: fechaCompra, gcwebcode })
+                });
+
+                console.log("Respuesta del servidor:", response.status);
+
+                if (response.ok) {
+                    const blob = await response.blob();
+                    console.log("Blob recibido del servidor.");
+
+                    const url = URL.createObjectURL(blob);
+                    console.log("URL creada para el blob:", url);
+
+                    // Mostrar la imagen generada
+                    previewImage.src = url;
+                    preview.style.display = "block";
+                    console.log("Vista previa mostrada.");
+                } else {
+                    console.error("Error al generar la Gift Card:", response.status);
+                    alert("Error al generar la Gift Card. Intenta nuevamente.");
+                }
+            } catch (error) {
+                console.error("Error en la solicitud:", error);
+                alert("Hubo un problema al generar la Gift Card.");
+            }
+        });
+    </script>
+</body>
+</html>

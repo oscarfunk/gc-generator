@@ -1,0 +1,19 @@
+{
+  "name": "gift-card-generator",
+  "version": "1.0.0",
+  "description": "Aplicación para generar gift cards personalizadas usando Node.js y Express.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "@napi-rs/canvas": "^0.1.26"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "keywords": ["gift card", "nodejs", "express", "canvas"],
+  "author": "Oscar Castro",
+  "license": "ISC"
+}

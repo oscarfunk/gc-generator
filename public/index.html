@@ -55,10 +55,8 @@
             border: 1px solid #ccc;
             border-radius: 8px;
         }
-
-        /* Estilos para el logo */
         .logo {
-            width: 100px; /* Ajusta el tamaño a tu preferencia */
+            width: 100px;
             height: auto;
             display: block;
             margin: 10px auto;
@@ -67,10 +65,7 @@
 </head>
 <body>
     <div class="container">
-        <!-- Agregar el logo de Akane -->
         <img src="https://akanespa.cl/wp-content/uploads/2022/02/Group_-160x179.png" alt="Logo de Akane Spa" class="logo">
-        
-    <div class="container">
         <h1>Generador de Gift Cards</h1>
         <form id="giftCardForm">
             <label for="destinatario">Nombre del Destinatario</label>
@@ -95,11 +90,11 @@
             <label for="fechaCompra">Fecha de Compra</label>
             <input type="date" id="fechaCompra" required>
 
-            <label for="mensaje">Mensaje especial (Opcional) </label>
+            <label for="mensaje">Mensaje especial (Opcional)</label>
             <input type="text" id="mensaje" pattern="[A-Za-zÀ-ÿ\s,.'-&]+" placeholder="Ejemplo: Feliz cumpleaños!">
 
             <label for="gcwebcode">Gift Card Web Code (Opcional)</label>
-            <input type="text" id="gcwebcode" name="code" pattern="[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}" placeholder="Ejemplo: NJL7-HJ9K-VLK6-Q4U4" title="El código debe estar en el formato: XXXX-XXXX-XXXX-XXXX" oninput="formatGiftCardCode(this)" maxlength="19" />
+            <input type="text" id="gcwebcode" name="code" pattern="[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}" placeholder="Ejemplo: NJL7-HJ9K-VLK6-Q4U4" title="El código debe estar en el formato: XXXX-XXXX-XXXX-XXXX" oninput="formatGiftCardCode(this)" maxlength="19">
             <input type="hidden" id="validez" name="validez">
 
             <button type="submit">Generar Gift Card</button>
@@ -112,101 +107,52 @@
     </div>
 
     <script>
-     function formatGiftCardCode(input) {
-        // Convertir el valor a mayúsculas
-        let value = input.value.toUpperCase();
-        
-        // Remover todo lo que no sea alfanumérico (letras y números)
-        value = value.replace(/[^A-Z0-9]/g, '');
-
-        // Limitar a 16 caracteres (sin contar los guiones)
-        value = value.substring(0, 16);
-
-        // Insertar guiones después de cada 4 caracteres
-        let formattedValue = '';
-        for (let i = 0; i < value.length; i++) {
-            formattedValue += value[i];
-            // Agregar un guion después de cada 4 caracteres
-            if ((i + 1) % 4 === 0 && i + 1 < value.length) {
-                formattedValue += '-';
-            }
+        function formatGiftCardCode(input) {
+            let value = input.value.toUpperCase().replace(/[^A-Z0-9]/g, '').substring(0, 16);
+            input.value = value.match(/.{1,4}/g)?.join('-') || value;
         }
 
-        // Establecer el valor formateado de vuelta al input
-        input.value = formattedValue;
-    }
+        document.getElementById("tipoMasaje").addEventListener("change", setValidez);
 
-    // Añadir un listener al campo de código web
-    document.getElementById("gcwebcode").addEventListener("input", function () {
-        formatGiftCardCode(this);
-    });
-
-    const tipoMasajeSelect = document.getElementById("tipoMasaje");
-    tipoMasajeSelect.addEventListener("change", () => {
-        const tipoMasaje = tipoMasajeSelect.value;
-        let validez = "*Tarjeta válida por 6 meses desde la fecha de emisión.";
-        if (tipoMasaje.includes("3 Sesiones")) {
-            validez = "*Tarjeta válida por 3 meses desde la fecha de emisión.";
-        }
-
-        // Asigna el texto al formulario o envíalo con tu lógica
-        document.getElementById("validez").value = validez;
-    });
-        const form = document.getElementById("giftCardForm");
-        const preview = document.getElementById("giftPreview");
-        const previewImage = document.getElementById("previewImage");
-
-        form.addEventListener("submit", async (e) => {
-            e.preventDefault();
-
-            // Obtener los valores del formulario
-            const destinatario = document.getElementById("destinatario").value;
-            const remitente = document.getElementById("remitente").value;
+        function setValidez() {
             const tipoMasaje = document.getElementById("tipoMasaje").value;
-            const fechaCompra = document.getElementById("fechaCompra").value;
-            let mensaje = document.getElementById("mensaje").value;
-            const gcwebcode = document.getElementById("gcwebcode").value;
-            const validez = document.getElementById("validez").value;
-            
-            // Envolver el mensaje en comillas dobles
-            mensaje = `"${mensaje}"`;  // Agrega las comillas al principio y al final
+            const validez = tipoMasaje.includes("3 Sesiones") 
+                ? "*Tarjeta válida por 3 meses desde la fecha de emisión." 
+                : "*Tarjeta válida por 6 meses desde la fecha de emisión.";
+            document.getElementById("validez").value = validez;
+        }
 
-            // Log de los valores capturados
-            console.log("Destinatario:", destinatario);
-            console.log("Remitente:", remitente);
-            console.log("Tipo de Masaje:", tipoMasaje);
-            console.log("Fecha de Compra:", fechaCompra);
-            console.log("mensaje:", mensaje);
-            console.log("Web Code:", gcwebcode);
-            console.log("validez", validez);
+        // Inicializa la validez al cargar la página
+        document.addEventListener("DOMContentLoaded", setValidez);
+
+        document.getElementById("giftCardForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const formData = {
+                destinatario: document.getElementById("destinatario").value,
+                remitente: document.getElementById("remitente").value,
+                tipo: document.getElementById("tipoMasaje").value,
+                fecha: document.getElementById("fechaCompra").value,
+                mensaje: `"${document.getElementById("mensaje").value}"`,
+                gcwebcode: document.getElementById("gcwebcode").value,
+                validez: document.getElementById("validez").value
+            };
 
             try {
-                console.log("Enviando datos al servidor...");
                 const response = await fetch("/generate/", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ mensaje, destinatario, remitente, tipo: tipoMasaje, fecha: fechaCompra, gcwebcode, validez })
+                    body: JSON.stringify(formData)
                 });
-
-                console.log("Respuesta del servidor:", response.status);
 
                 if (response.ok) {
                     const blob = await response.blob();
-                    console.log("Blob recibido del servidor.");
-
                     const url = URL.createObjectURL(blob);
-                    console.log("URL creada para el blob:", url);
-
-                    // Mostrar la imagen generada
-                    previewImage.src = url;
-                    preview.style.display = "block";
-                    console.log("Vista previa mostrada.");
+                    document.getElementById("previewImage").src = url;
+                    document.getElementById("giftPreview").style.display = "block";
                 } else {
-                    console.error("Error al generar la Gift Card:", response.status);
                     alert("Error al generar la Gift Card. Intenta nuevamente.");
                 }
             } catch (error) {
-                console.error("Error en la solicitud:", error);
                 alert("Hubo un problema al generar la Gift Card.");
             }
         });

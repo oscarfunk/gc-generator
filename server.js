@@ -78,7 +78,7 @@ app.post("/generate/", async (req, res) => {
             },
             {
                 text: validez, // Aquí ya está en formato DD/MM/AAAA
-                font: "italic 26px Segoe UI",
+                font: "italic 22px Segoe UI",
                 color: "#4D4B9E",
                 y: 1050,
             },

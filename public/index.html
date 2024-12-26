@@ -100,6 +100,7 @@
 
             <label for="gcwebcode">Gift Card Web Code (Opcional)</label>
             <input type="text" id="gcwebcode" name="code" pattern="[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}" placeholder="Ejemplo: NJL7-HJ9K-VLK6-Q4U4" title="El código debe estar en el formato: XXXX-XXXX-XXXX-XXXX" oninput="formatGiftCardCode(this)" maxlength="19" />
+            <input type="hidden" id="validez" name="validez">
 
             <button type="submit">Generar Gift Card</button>
         </form>
@@ -140,7 +141,17 @@
         formatGiftCardCode(this);
     });
 
+    const tipoMasajeSelect = document.getElementById("tipoMasaje");
+    tipoMasajeSelect.addEventListener("change", () => {
+        const tipoMasaje = tipoMasajeSelect.value;
+        let validez = "*Tarjeta válida por 6 meses desde la fecha de emisión.";
+        if (tipoMasaje.includes("3 Sesiones")) {
+            validez = "*Tarjeta válida por 3 meses desde la fecha de emisión.";
+        }
 
+        // Asigna el texto al formulario o envíalo con tu lógica
+        document.getElementById("validez").value = validez;
+    });
         const form = document.getElementById("giftCardForm");
         const preview = document.getElementById("giftPreview");
         const previewImage = document.getElementById("previewImage");
@@ -155,6 +166,7 @@
             const fechaCompra = document.getElementById("fechaCompra").value;
             let mensaje = document.getElementById("mensaje").value;
             const gcwebcode = document.getElementById("gcwebcode").value;
+            const validez = document.getElementById("validez").value;
             
             // Envolver el mensaje en comillas dobles
             mensaje = `"${mensaje}"`;  // Agrega las comillas al principio y al final
@@ -166,13 +178,14 @@
             console.log("Fecha de Compra:", fechaCompra);
             console.log("mensaje:", mensaje);
             console.log("Web Code:", gcwebcode);
+            console.log("validez", validez);
 
             try {
                 console.log("Enviando datos al servidor...");
                 const response = await fetch("/generate/", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ mensaje, destinatario, remitente, tipo: tipoMasaje, fecha: fechaCompra, gcwebcode })
+                    body: JSON.stringify({ mensaje, destinatario, remitente, tipo: tipoMasaje, fecha: fechaCompra, gcwebcode, validez })
                 });
 
                 console.log("Respuesta del servidor:", response.status);

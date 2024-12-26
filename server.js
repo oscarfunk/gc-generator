@@ -10,7 +10,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
 app.post("/generate/", async (req, res) => {
-    let { mensaje, destinatario, remitente, tipo, fecha, gcwebcode } = req.body;
+    let { mensaje, destinatario, remitente, tipo, fecha, gcwebcode, validez } = req.body;
         console.log("Payload recibido:", req.body);
         console.log("Destinatario:", destinatario); // Verifica si es undefined
 
@@ -23,7 +23,7 @@ app.post("/generate/", async (req, res) => {
         fecha = `${day}/${month}/${year}`; // Ajuste al formato requerido
 
         // Cargar la plantilla de la gift card
-        const templatePath = path.join(__dirname, "assets", "gift-card-template.png");
+        const templatePath = path.join(__dirname, "assets", "gift-card-template-v3.png");
         const image = await loadImage(templatePath);
 
         // Crear un canvas del tamaño de la imagen
@@ -37,16 +37,16 @@ app.post("/generate/", async (req, res) => {
         const textStyles = [
             {
                 text: gcwebcode ? "Código: " + gcwebcode : "",
-                font: "bold 30px Segoe UI",
+                font: "bold 26px Segoe UI",
                 color: "#4D4B9E",
                 x: 685,
                 y: 375,
             },
             {
                 text: mensaje,
-                font: "italic 28px Segoe UI",
+                font: "italic 25px Segoe UI",
                 color: "#4D4B9E",
-                y: 616, // Mantén la posición vertical fija
+                y: 550, // Mantén la posición vertical fija
             },
             {
                 text: destinatario,
@@ -75,6 +75,12 @@ app.post("/generate/", async (req, res) => {
                 color: "#4D4B9E",
                 x: 530,
                 y: 968,
+            },
+            {
+                text: validez, // Aquí ya está en formato DD/MM/AAAA
+                font: "italic 26px Segoe UI",
+                color: "#4D4B9E",
+                y: 1050,
             },
         ];
         
@@ -108,7 +114,7 @@ app.post("/generate/", async (req, res) => {
             ctx.font = font;
             ctx.fillStyle = color;
 
-    if (text === mensaje || text.includes("Código: " + gcwebcode)) {
+        if (text === mensaje || text.includes("Código: " + gcwebcode) || text === validez)  {
         // Solo aplicar wrapText a 'mensaje'
         const lines = wrapText(ctx, text, MAX_WIDTH);
 
